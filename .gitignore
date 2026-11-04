@@ -1,0 +1,16 @@
+# Environment variables
+.env
+
+# Analysis cache
+.analysis_cache.json
+
+# Python cache and virtual environment
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# Streamlit cache
+.streamlit/
