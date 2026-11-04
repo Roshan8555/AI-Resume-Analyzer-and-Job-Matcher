@@ -1,140 +1,132 @@
-# 📄 AI Resume Analyzer and Job Matcher
+# 🔍 RAG-Powered AI Resume Analyzer and Job Matcher
 
-An AI-powered web application that analyzes resumes against target job descriptions using **Prompt Engineering** and the **Groq API**, built **without RAG, embeddings, or vector databases**.
+An enterprise-grade **Retrieval-Augmented Generation (RAG)** application that semantically indexes resume documents into a **ChromaDB Vector Database**, performs **Multi-Query Semantic Vector Retrieval**, and uses **Groq LLM** with structured prompt engineering to evaluate candidate fit, identify skill gaps, and rewrite bullet points with grounded evidence citations.
 
 ---
 
 ## 🌟 Overview
 
-The **AI Resume Analyzer and Job Matcher** is designed for job seekers and hiring professionals to quickly evaluate candidate-role alignment. By leveraging **PyMuPDF** for instant PDF text extraction, a fine-tuned **System Prompt** with strict anti-hallucination guardrails, and Groq's high-speed inference engine running **`openai/gpt-oss-120b`** in deterministic JSON mode, the app delivers comprehensive, actionable feedback in seconds.
-
-### Key Capabilities
-- 🎯 **Match Score (0–100)**: Objective scoring based on relevant job requirements.
-- 🛠️ **Skill Gap Identification**: Side-by-side color-coded badges for **Matched Skills** vs. **Missing / Unverified Skills**.
-- 🔍 **ATS Keyword Comparison**: Scans for exact industry terms and keywords needed to pass Applicant Tracking Systems.
-- ✍️ **Bullet Point Improvements (Before vs. After)**: Rewrites up to 3 resume bullet points to emphasize quantifiable impact, action verbs, and target keywords—strictly grounded in original facts without hallucination.
-- 💡 **Strategic Career Recommendations**: Tailored suggestions for certifications, portfolio additions, and phrasing tweaks.
-- 📥 **One-Click Export**: Download the complete evaluation report as **Markdown (`.md`)** or **structured JSON (`.json`)**.
+The **RAG AI Resume Analyzer and Job Matcher** transforms static resume evaluation into an intelligent, vector-backed knowledge retrieval system. Instead of merely feeding raw text to an LLM, the application:
+1. Chunks multi-page PDF resumes into semantic, section-aware document units.
+2. Embeds and stores chunks in a local **ChromaDB Vector Database** using dense embeddings (`all-MiniLM-L6-v2`, 384-dimensional cosine space).
+3. Breaks down target Job Descriptions into multi-dimensional requirement queries (Technical Skills, Past Experience, Specialized Tools/Databases, Domain Qualifications).
+4. Performs **Cosine Vector Search** to retrieve the most relevant evidence chunks with similarity confidence scores.
+5. Injects the retrieved evidence as **Augmented Context** into Groq's high-speed inference engine (`openai/gpt-oss-120b`) in deterministic JSON mode.
+6. Presents an interactive **RAG Knowledge Base & Retrieval Inspector** allowing users and recruiters to visually inspect retrieved evidence or perform semantic queries directly against the candidate's vector store.
 
 ---
 
-## 🏗️ How This Project Was Built
+## 🏗️ System Architecture (RAG Pipeline)
 
-### 1. Architectural Philosophy: Why No RAG or Vector Database?
-Many modern AI tutorials unnecessarily introduce Retrieval-Augmented Generation (RAG), chunking pipelines, embedding models, and vector databases (e.g., Pinecone, ChromaDB) for single-document comparison tasks. 
+```
+                       +---------------------------------------+
+                       |           Candidate Resume            |
+                       |       (PDF Upload or Raw Text)        |
+                       +-------------------+-------------------+
+                                           |
+                                           v
+                             [ PyMuPDF Text Extractor ]
+                                           |
+                                           v
+                           [ Section-Aware Text Chunking ]
+                        (Summary, Experience, Skills, Projects)
+                                           |
+                                           v
+                       +---------------------------------------+
+                       |       ChromaDB Vector Database        |
+                       |  - Model: all-MiniLM-L6-v2 (384d)     |
+                       |  - Metric: Cosine Similarity          |
+                       +-------------------+-------------------+
+                                           |
+    +-----------------------------+        |
+    |   Target Job Description    |        |
+    +--------------+--------------+        |
+                   |                       |
+                   v                       |
+   [ Multi-Query Decomposition ]           |
+   - Technical Stack Requirements          |
+   - Experience & Seniority Depth          |
+   - ATS Keywords & Tooling                |
+                   |                       |
+                   +-----------> [ Semantic Vector Search ] <-----------+
+                                (Top-K KNN Cosine Retrieval)
+                                           |
+                                           v
+                             +---------------------------+
+                             | Retrieved Evidence Chunks |
+                             | (with Similarity Scores)  |
+                             +-------------+-------------+
+                                           |
+                                           v
+                             +---------------------------+
+                             | Augmented Prompt Synthesis|
+                             |  - System Prompt          |
+                             |  - Retrieved Evidence     |
+                             |  - Job Requirements       |
+                             +-------------+-------------+
+                                           |
+                                           v
+                             +---------------------------+
+                             |    Groq LLM Inference     |
+                             |  - openai/gpt-oss-120b    |
+                             |  - Temperature: 0.0       |
+                             |  - JSON Mode              |
+                             +-------------+-------------+
+                                           |
+                                           v
+                             +---------------------------+
+                             |   Evaluation Dashboard    |
+                             |  - Grounded Match Score   |
+                             |  - Verified Skill Badges  |
+                             |  - RAG Vector Inspector   |
+                             |  - Interactive Resume QA  |
+                             |  - Before/After Rewrites  |
+                             +---------------------------+
+```
 
-For resume analysis, both documents (the candidate's resume and the job description) comfortably fit within the large context window of modern LLMs (128k+ tokens). 
-- **Zero Vector DB Overhead**: No embeddings to compute, index, or store.
-- **Whole-Document Semantic Context**: The LLM evaluates the entire resume holistically rather than fragmented chunks.
-- **Ultra-Fast Sub-Second Response Times**: Direct prompt-to-API inference via Groq's LPU acceleration.
-- **Deterministic Structured JSON**: Direct schema enforcement ensures the UI renders reliably every single time.
+---
 
-### 2. Technology Stack
+## 🛠️ Technology Stack
 
-| Technology | Role | Purpose |
+| Component | Technology | Description |
 | :--- | :--- | :--- |
-| **Python 3.12** | Core Language | Application logic, file parsing, and API orchestration |
-| **Streamlit** | Frontend UI | Clean, reactive web interface with zero sidebar clutter |
-| **Groq API** | LLM Inference | High-speed, low-latency API access to top open-source models |
-| **`openai/gpt-oss-120b`** | LLM Model | Single best high-capacity model (120B parameters) hosted on Groq |
-| **PyMuPDF (`fitz`)** | PDF Ingestion | In-memory text extraction from multi-page PDF documents |
-| **python-dotenv** | Security | Secure environment configuration keeping API keys out of the frontend |
-
-### 3. Clean Frontend / Secure Backend Separation
-- **No API Key on UI**: The API key is securely loaded from `.env` in the backend. Users never have to enter credentials on the interface.
-- **Single Best Model**: Instead of overwhelming users with model dropdowns or risking model deprecation errors, the application uses `openai/gpt-oss-120b`, optimized for nuanced semantic extraction and structured JSON compliance.
-- **No Distracting Sample Buttons**: A clean, focused interface featuring dual input columns (Resume Upload/Paste + Job Description) and a primary action button.
+| **Vector Database** | **ChromaDB** | High-performance in-memory vector store indexing chunk embeddings |
+| **Embedding Model** | **`all-MiniLM-L6-v2`** | 384-dimensional dense semantic sentence embeddings (ONNX runtime) |
+| **LLM Inference** | **Groq API** | Sub-second inference engine hosting open-source LLMs |
+| **LLM Model** | **`openai/gpt-oss-120b`** | 120B parameter model optimized for complex reasoning & JSON output |
+| **Document Parsing** | **PyMuPDF (`fitz`)** | Fast in-memory parsing for multi-page PDF documents |
+| **Application UI** | **Streamlit** | Modern, reactive dashboard with interactive RAG vector search |
+| **Environment** | **python-dotenv** | Secure local environment credential management |
 
 ---
 
-## ⚙️ How This Project Works (Step-by-Step Pipeline)
+## 🚀 Key Features
 
-```
-+-----------------------------------+        +-----------------------------------+
-|            Resume PDF             |        |          Job Description          |
-|    (Uploaded via Streamlit)       |        |        (Pasted by the User)       |
-+-----------------+-----------------+        +-----------------+-----------------+
-                  |                                            |
-                  v                                            |
-      [ PyMuPDF Text Extraction ]                              |
-                  |                                            |
-                  +---------------------+----------------------+
-                                        |
-                                        v
-                       +---------------------------------+
-                       |    Prompt Engineering Engine    |
-                       |  - System Role & Strict Grounding|
-                       |  - JSON Schema Constraints      |
-                       |  - Anti-Hallucination Rules     |
-                       +----------------+----------------+
-                                        |
-                                        v
-                       +---------------------------------+
-                       |     Groq API (gpt-oss-120b)     |
-                       |  - Temperature: 0.2 (low drift) |
-                       |  - response_format: json_object |
-                       +----------------+----------------+
-                                        |
-                                        v
-                       +---------------------------------+
-                       |     Structured JSON Response    |
-                       |  - match_score                  |
-                       |  - matched/missing skills       |
-                       |  - matched/missing keywords     |
-                       |  - bullet_improvements          |
-                       |  - recommendations              |
-                       +----------------+----------------+
-                                        |
-                                        v
-                       +---------------------------------+
-                       |      Streamlit Dashboard UI     |
-                       |  - Score & Visual Progress Bar  |
-                       |  - Color-Coded Skill Badges     |
-                       |  - Before / After Bullet Cards  |
-                       |  - Download Markdown & JSON     |
-                       +---------------------------------+
-```
+### 1. Multi-Query Semantic Vector Retrieval
+The Job Description is decomposed into distinct analytical queries:
+- **Core Skills**: Evaluates programming languages and primary frameworks.
+- **Experience Alignment**: Retrieves project duties and workplace contributions.
+- **Tools & Infrastructure**: Scans for databases, CI/CD, and cloud platforms.
+- **Domain & Education**: Checks degree qualifications and domain certifications.
 
-### Step 1: Document Processing (`resume_analyzer.py`)
-- Accepts PDF uploads as binary streams or file objects directly from Streamlit.
-- PyMuPDF opens the in-memory stream and iterates over each page to extract clean, uncorrupted plain text while preserving headers and lists.
-- Supports direct text pasting via an expandable section for maximum flexibility.
+### 2. Grounded, Deterministic Scoring
+- Greedy decoding (`temperature=0.0`) and fixed seed (`seed=42`).
+- Score is calculated mathematically based on retrieved evidence:
+  - **55%** Verified Skills Evidence.
+  - **25%** ATS Keywords Coverage.
+  - **20%** Qualitative Experience Alignment.
+- Persistent SHA-256 disk caching guarantees that the same resume and job description always produce the exact same score.
 
-### Step 2: Prompt Engineering (`prompt.py`)
-The system prompt enforces five critical guardrails:
-1. **Strict Factual Grounding**: The LLM is explicitly forbidden from inventing skills, certifications, or past achievements.
-2. **Missing Evidence vs. Lack of Skill**: Differentiates between skills explicitly missing vs. skills merely absent from the resume text.
-3. **Structured Bullet Rewriting**: Bullet points are rewritten only using facts verifiable in the original resume, framed with strong action verbs and target metrics.
-4. **Adversarial Defense**: Treats all input text as untrusted data to ignore any prompt injection attempts embedded within candidate resumes.
-5. **JSON Schema Enforcement**: Guarantees output conforms to a strict dictionary format:
-   ```json
-   {
-     "match_score": 85,
-     "matched_skills": ["Python", "FastAPI", "Docker"],
-     "missing_skills": ["Kubernetes", "AWS ECS"],
-     "matched_keywords": ["REST APIs", "Microservices"],
-     "missing_keywords": ["CI/CD Pipeline", "Redis"],
-     "bullet_improvements": [
-       {
-         "before": "Built APIs using Python.",
-         "after": "Architected high-throughput REST APIs using Python and FastAPI, reducing response latency by 20%.",
-         "reason": "Incorporates target keywords and frames responsibilities into quantifiable impact."
-       }
-     ],
-     "recommendations": ["Highlight cloud deployment experience prominently."]
-   }
-   ```
+### 3. Interactive RAG Vector Inspector & Resume QA
+- **Evidence Cards**: Inspect the exact chunks retrieved from the vector store with their cosine similarity percentages.
+- **Query Your Resume**: A built-in search tool allowing recruiters or candidates to run semantic vector queries against the candidate's resume (e.g. *"Show experience with Docker containerization"*).
 
-### Step 3: Groq LLM Inference
-- Calls `client.chat.completions.create` with `model="openai/gpt-oss-120b"`.
-- Sets `temperature=0.2` to eliminate hallucination and promote deterministic analytical accuracy.
-- Enforces native JSON mode via `response_format={"type": "json_object"}`.
+### 4. Fact-Grounded Bullet Rewriting (Before vs. After)
+- Rewrites up to 3 resume bullet points to emphasize quantifiable impact, action verbs, and target keywords.
+- Strictly grounded in the retrieved resume context—the model is forbidden from inventing unverified claims.
 
-### Step 4: UI Rendering & Export (`app.py`)
-- Parses the validated JSON object into dynamic Streamlit components.
-- Renders green badges for matched competencies and red badges for missing requirements.
-- Presents side-by-side expandable cards displaying **Before**, **After**, and the **Rationale** for each improved bullet.
-- Generates downloadable Markdown and JSON files with a single click.
+### 5. Instant Report Export
+- Download comprehensive evaluation reports in **Markdown (`.md`)** or structured **JSON (`.json`)** format.
 
 ---
 
@@ -142,83 +134,76 @@ The system prompt enforces five critical guardrails:
 
 ```
 ai_resume_analyzer/
-├── app.py                 # Streamlit web application & interactive dashboard
-├── resume_analyzer.py     # PDF text extraction & Groq API LLM caller
-├── prompt.py              # System prompt, constraints, and JSON schema
-├── requirements.txt       # Project dependencies
-├── .env                   # API secrets (GROQ_API_KEY, GROQ_MODEL) - DO NOT COMMIT
-├── .env.example           # Template for environment configuration
-├── .gitignore             # Git ignore file protecting .env and cache
-├── sample_resume.pdf      # Sample resume for quick verification
-├── test_setup.py          # Automated verification script
-└── README.md              # Project documentation
+├── app.py                             # Streamlit web interface & RAG Inspector
+├── rag_engine.py                      # ChromaDB vector store, chunking & semantic search
+├── resume_analyzer.py                 # RAG orchestration, caching, & Groq LLM API caller
+├── prompt.py                          # RAG system prompt & JSON schema constraints
+├── requirements.txt                   # Project dependencies (ChromaDB, Groq, PyMuPDF, etc.)
+├── .env                               # Local secrets (GROQ_API_KEY, GROQ_MODEL) - Ignored by Git
+├── .env.example                       # Configuration template
+├── .gitignore                         # Protects .env, caches, and bytecode
+├── sample_resume.pdf                  # Sample resume for verification
+├── test_setup.py                      # Automated test script for vector indexing & PDF extraction
+├── test_score_consistency.py          # Determinism and consistency test script
+├── generate_ppt.py                    # PowerPoint presentation generator
+└── AI_Resume_Analyzer_Presentation.pptx # 10-slide PowerPoint presentation
 ```
 
 ---
 
-## 🚀 Setup & Installation Guide
+## 🏁 Setup & Installation Guide
 
 ### Prerequisites
 - **Python 3.10+** (Tested on Python 3.12)
 - A free **Groq API Key** from [console.groq.com](https://console.groq.com/)
 
-### 1. Clone or Navigate to the Project
+### 1. Clone the Repository
 ```bash
-cd ai_resume_analyzer
+git clone https://github.com/Roshan8555/AI-Resume-Analyzer-and-Job-Matcher.git
+cd AI-Resume-Analyzer-and-Job-Matcher
 ```
 
-### 2. (Optional) Create a Virtual Environment
-```bash
-python -m venv .venv
-# On Windows:
-.venv\Scripts\activate
-# On Linux / macOS:
-source .venv/bin/activate
-```
-
-### 3. Install Required Libraries
+### 2. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configure Environment Variables
+### 3. Configure API Key
 Create a `.env` file in the project root:
 ```env
 GROQ_API_KEY=your_actual_groq_api_key_here
 GROQ_MODEL=openai/gpt-oss-120b
 ```
 
-> **Security Note**: Never commit `.env` to Git. The `.gitignore` file is already set up to exclude it.
-
-### 5. Run the Automated Test Suite
-To confirm PDF extraction and prompt integrity:
+### 4. Run Automated RAG Verification
 ```bash
 python test_setup.py
 ```
+*Expected Output: ChromaDB Indexing Test PASSED! ChromaDB Vector Retrieval Test PASSED!*
 
-### 6. Launch the Streamlit Application
+### 5. Launch the Streamlit Web Application
 ```bash
 streamlit run app.py
 ```
-Open your browser at:
-👉 **`http://localhost:8501`**
+Open **`http://localhost:8501`** in your browser.
 
 ---
 
 ## 💡 How to Use the Application
 
-1. **Upload Resume**: Drag and drop your resume in PDF format (or paste the plain text directly).
-2. **Paste Job Description**: Paste the target job posting (responsibilities, required qualifications).
-3. **Click "🚀 Analyze Resume Fit"**: The app processes the resume and sends it to the Groq LLM.
-4. **Review Results**:
-   - Check your **Match Score**.
-   - Review **Matched Skills** and **Missing Skills** to identify gaps.
-   - Inspect **ATS Keywords** to align vocabulary.
-   - Read the **Before vs. After Bullet Point Improvements** to see how to describe your experience with more impact.
-5. **Download Report**: Click **"Download Markdown Report"** to save your personalized improvement plan.
+1. **Upload Resume**: Upload your resume PDF or paste the text directly.
+2. **Paste Job Description**: Paste target job requirements and responsibilities.
+3. **Click "🚀 Run RAG Analysis"**:
+   - The app chunks and indexes your resume into ChromaDB.
+   - It performs semantic vector retrieval to gather grounded evidence.
+   - Groq LLM evaluates alignment and generates bullet rewrites.
+4. **Explore the RAG Inspector**:
+   - View the retrieved chunks and cosine similarity scores.
+   - Use the **Interactive Vector Search** bar to ask questions about your resume.
+5. **Download Report**: Export your customized report in Markdown or JSON format.
 
 ---
 
-## 🛡️ License & Contributing
+## 🛡️ License
 
-Built as a lightweight, open-source reference project demonstrating effective Prompt Engineering, structured LLM outputs, and document analysis. Contributions and enhancements are welcome!
+Built as an open-source reference implementation of Retrieval-Augmented Generation (RAG) for document intelligence and career tech workflows.

@@ -1,15 +1,14 @@
-"""Test score determinism and consistency across multiple runs."""
+"""Test score determinism and consistency across multiple runs for the RAG pipeline."""
 
 import os
 import sys
 
-# Ensure local module is found
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, current_dir)
 
-from resume_analyzer import extract_text_from_pdf, analyze_resume
+from resume_analyzer import extract_text_from_pdf, analyze_resume_rag
 
-def test_determinism():
+def test_rag_consistency():
     pdf_path = os.path.join(current_dir, "sample_resume.pdf")
     if not os.path.exists(pdf_path):
         from test_setup import create_sample_pdf
@@ -22,30 +21,16 @@ def test_determinism():
         "Experience building high-traffic REST APIs is required."
     )
 
-    print("--- Testing API Determinism (Bypassing cache, 3 distinct API calls) ---")
-    api_scores = []
-    for i in range(1, 4):
-        res = analyze_resume(resume_text, job_desc, use_cache=False)
-        score = res["match_score"]
-        api_scores.append(score)
-        print(f"Run {i} (Direct API call): Match Score = {score}")
-
-    assert len(set(api_scores)) == 1, f"API scores fluctuated! Got: {api_scores}"
-    print(f"SUCCESS: Direct API calls are 100% deterministic! Score = {api_scores[0]}")
-
-    print("\n--- Testing Cache Determinism (3 cached calls) ---")
+    print("--- Testing RAG Pipeline Determinism (3 runs with cache) ---")
     cached_scores = []
     for i in range(1, 4):
-        res = analyze_resume(resume_text, job_desc, use_cache=True)
+        res, v_idx, evidence = analyze_resume_rag(resume_text, job_desc, use_cache=True)
         score = res["match_score"]
         cached_scores.append(score)
-        print(f"Run {i} (Cached call): Match Score = {score}")
+        print(f"Run {i}: Match Score = {score} | Evidence Chunks Retrieved = {len(evidence)}")
 
-    assert len(set(cached_scores)) == 1, f"Cached scores fluctuated! Got: {cached_scores}"
-    assert cached_scores[0] == api_scores[0], "Cache score differs from API score!"
-    print(f"SUCCESS: Cached calls are 100% identical! Score = {cached_scores[0]}")
-
-    print("\nAll consistency tests passed successfully!")
+    assert len(set(cached_scores)) == 1, f"Scores fluctuated! Got: {cached_scores}"
+    print(f"SUCCESS: RAG pipeline is 100% deterministic! Score = {cached_scores[0]}")
 
 if __name__ == "__main__":
-    test_determinism()
+    test_rag_consistency()

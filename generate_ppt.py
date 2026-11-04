@@ -1,4 +1,4 @@
-"""Generate a professional PowerPoint presentation for the AI Resume Analyzer project."""
+"""Generate a professional PowerPoint presentation for the RAG AI Resume Analyzer project."""
 
 import os
 from pptx import Presentation
@@ -22,7 +22,7 @@ def create_presentation(output_path: str):
     
     blank_slide_layout = prs.slide_layouts[6]
     
-    def add_header(slide, title_text, category_text="AI RESUME ANALYZER & JOB MATCHER"):
+    def add_header(slide, title_text, category_text="RAG-POWERED AI RESUME ANALYZER"):
         title_box = slide.shapes.add_textbox(Inches(0.8), Inches(0.6), Inches(8.4), Inches(1.1))
         tf = title_box.text_frame
         tf.word_wrap = True
@@ -56,17 +56,17 @@ def create_presentation(output_path: str):
     tf1.word_wrap = True
     
     p1 = tf1.paragraphs[0]
-    p1.text = "AI RESUME ANALYZER &\nJOB MATCHER"
+    p1.text = "RAG-POWERED AI RESUME ANALYZER\n& JOB MATCHER"
     p1.alignment = PP_ALIGN.CENTER
-    p1.font.size = Pt(36)
+    p1.font.size = Pt(34)
     p1.font.bold = True
     p1.font.color.rgb = PRIMARY_COLOR
     p1.space_after = Pt(16)
     
     p1_sub = tf1.add_paragraph()
-    p1_sub.text = "An LLM-Powered Career Assistant using Prompt Engineering, Groq & Streamlit"
+    p1_sub.text = "Retrieval-Augmented Generation using ChromaDB, Dense Embeddings, Groq & Streamlit"
     p1_sub.alignment = PP_ALIGN.CENTER
-    p1_sub.font.size = Pt(16)
+    p1_sub.font.size = Pt(15)
     p1_sub.font.color.rgb = SECONDARY_COLOR
     
     author_box = slide1.shapes.add_textbox(Inches(1.0), Inches(4.8), Inches(8.0), Inches(1.0))
@@ -79,33 +79,33 @@ def create_presentation(output_path: str):
 
     # ==================== SLIDE 2: Project Introduction ====================
     slide2 = prs.slides.add_slide(blank_slide_layout)
-    add_header(slide2, "Project Introduction")
+    add_header(slide2, "Project Introduction & RAG Overview")
     body2 = slide2.shapes.add_textbox(Inches(0.8), Inches(2.0), Inches(8.4), Inches(4.8))
     tf2 = body2.text_frame
     tf2.word_wrap = True
     
     p = tf2.paragraphs[0]
-    p.text = "• AI Resume Analyzer and Job Matcher is a lightweight, high-performance web application designed to evaluate candidate resumes against target job descriptions using LLMs."
+    p.text = "• An enterprise-grade Retrieval-Augmented Generation (RAG) system engineered to evaluate candidate resumes against complex job specifications using semantic vector indexing."
     p.font.size = Pt(15)
     p.font.color.rgb = DARK_TEXT
     p.space_after = Pt(14)
     
     p = tf2.add_paragraph()
-    p.text = "• The system delivers complete candidate evaluation:"
+    p.text = "• Core RAG Capabilities:"
     p.font.size = Pt(15)
     p.font.bold = True
     p.font.color.rgb = PRIMARY_COLOR
     p.space_after = Pt(8)
     
     features = [
-        "Automated PDF resume text extraction via PyMuPDF (fitz)",
-        "Prompt-engineered semantic analysis against job specifications",
-        "Deterministic, consistent match scoring (0 to 100)",
-        "Categorization of matched technical & domain skills",
-        "Identification of missing qualifications and requirement gaps",
-        "ATS (Applicant Tracking System) keyword alignment analysis",
-        "Grounded resume bullet point rewrites (Before vs. After)",
-        "Strategic career recommendations and exportable reports"
+        "In-memory ChromaDB vector database indexing resume chunks",
+        "Dense vector embeddings via all-MiniLM-L6-v2 (384-dimensional cosine space)",
+        "Multi-query semantic vector search decomposing job requirements",
+        "Augmented prompt synthesis providing exact evidence citations",
+        "Grounded match scoring anchored to verified vector evidence",
+        "Fact-based resume bullet point optimization (Before vs. After)",
+        "Interactive Vector Search bar (Query Your Resume) in Streamlit",
+        "Downloadable reports with RAG metadata in Markdown and JSON"
     ]
     for feat in features:
         p = tf2.add_paragraph()
@@ -116,25 +116,25 @@ def create_presentation(output_path: str):
 
     # ==================== SLIDE 3: Technologies & Architecture ====================
     slide3 = prs.slides.add_slide(blank_slide_layout)
-    add_header(slide3, "Technologies & Architecture")
+    add_header(slide3, "Technologies & RAG Architecture")
     body3 = slide3.shapes.add_textbox(Inches(0.8), Inches(2.0), Inches(8.4), Inches(4.8))
     tf3 = body3.text_frame
     tf3.word_wrap = True
     
     p = tf3.paragraphs[0]
-    p.text = "• Built without RAG, embeddings, or vector databases for speed, simplicity, and reliability:"
+    p.text = "• A state-of-the-art modular RAG stack designed for accuracy and high-speed execution:"
     p.font.size = Pt(15)
     p.font.color.rgb = DARK_TEXT
     p.space_after = Pt(12)
     
     tech_stack = [
-        ("Python 3.12", "Core application logic, file parsing, and API orchestration"),
-        ("Streamlit", "Clean, user-centric web dashboard with zero configuration clutter"),
-        ("Groq API", "High-speed inference platform running our single best model"),
+        ("ChromaDB", "Vector Database: Manages chunk indexing, HNSW index, and cosine similarity"),
+        ("all-MiniLM-L6-v2", "Embedding Engine: Generates 384-dimensional dense semantic vectors"),
+        ("Groq API", "High-speed inference platform executing prompt-augmented LLM completions"),
         ("openai/gpt-oss-120b", "Single top-tier 120B parameter model optimized for reasoning & JSON mode"),
-        ("PyMuPDF (fitz)", "In-memory document parsing for multi-page PDF resumes"),
-        ("Prompt Engineering", "System instructions, domain guardrails, and anti-hallucination rules"),
-        ("python-dotenv", "Secure backend credential management keeping API keys off the UI")
+        ("PyMuPDF (fitz)", "Document parsing: In-memory text extraction from multi-page PDF resumes"),
+        ("Streamlit", "User Interface: Modern dashboard with dedicated RAG Knowledge Base Inspector"),
+        ("python-dotenv", "Security: Backend environment configuration keeping API keys protected")
     ]
     for tech, desc in tech_stack:
         p = tf3.add_paragraph()
@@ -143,25 +143,24 @@ def create_presentation(output_path: str):
         p.font.color.rgb = DARK_TEXT
         p.space_after = Pt(6)
 
-    # ==================== SLIDE 4: Resume Ingestion & PDF Extraction ====================
+    # ==================== SLIDE 4: Document Ingestion & Chunking ====================
     slide4 = prs.slides.add_slide(blank_slide_layout)
-    add_header(slide4, "Resume Ingestion & PDF Extraction")
+    add_header(slide4, "Document Ingestion & Section Chunking")
     body4 = slide4.shapes.add_textbox(Inches(0.8), Inches(2.0), Inches(8.4), Inches(4.8))
     tf4 = body4.text_frame
     tf4.word_wrap = True
     
     p = tf4.paragraphs[0]
-    p.text = "• PyMuPDF (fitz) Integration:"
+    p.text = "• PyMuPDF Document Extraction:"
     p.font.size = Pt(16)
     p.font.bold = True
     p.font.color.rgb = PRIMARY_COLOR
     p.space_after = Pt(6)
     
     points4_1 = [
-        "Lightweight C-based extraction library with minimal memory overhead.",
-        "Processes multi-page PDF documents and extracts clean plain text.",
-        "Preserves logical section ordering, headers, and bullet structures.",
-        "Operates directly on in-memory byte buffers from Streamlit's file uploader."
+        "Lightweight C-based extraction parsing multi-page PDF files into raw text.",
+        "Processes in-memory byte buffers from Streamlit without saving temporary files.",
+        "Preserves original formatting, headers, and bullet structures."
     ]
     for pt in points4_1:
         p = tf4.add_paragraph()
@@ -171,7 +170,7 @@ def create_presentation(output_path: str):
         p.space_after = Pt(4)
         
     p = tf4.add_paragraph()
-    p.text = "• Flexible Input Handling:"
+    p.text = "• Section-Aware Semantic Chunking (rag_engine.py):"
     p.font.size = Pt(16)
     p.font.bold = True
     p.font.color.rgb = PRIMARY_COLOR
@@ -179,9 +178,9 @@ def create_presentation(output_path: str):
     p.space_after = Pt(6)
     
     points4_2 = [
-        "Dual input modes: direct PDF file upload OR manual text paste.",
-        "Input sanitization: strips extra whitespace and normalizes character encoding.",
-        "Protects against untrusted input: treats extracted text strictly as inert data."
+        "Identifies major resume sections (Summary, Experience, Skills, Projects, Education).",
+        "Creates overlapping sliding-window chunks (350 chars with 50-char overlap).",
+        "Enriches each chunk with metadata: chunk_id, section name, and character bounds."
     ]
     for pt in points4_2:
         p = tf4.add_paragraph()
@@ -190,25 +189,24 @@ def create_presentation(output_path: str):
         p.font.color.rgb = DARK_TEXT
         p.space_after = Pt(4)
 
-    # ==================== SLIDE 5: Prompt Engineering & Schema Design ====================
+    # ==================== SLIDE 5: ChromaDB Vector Indexing ====================
     slide5 = prs.slides.add_slide(blank_slide_layout)
-    add_header(slide5, "Prompt Engineering & Schema Design")
+    add_header(slide5, "Vector Indexing & ChromaDB Storage")
     body5 = slide5.shapes.add_textbox(Inches(0.8), Inches(2.0), Inches(8.4), Inches(4.8))
     tf5 = body5.text_frame
     tf5.word_wrap = True
     
     p = tf5.paragraphs[0]
-    p.text = "• SYSTEM_PROMPT Core Principles:"
+    p.text = "• Dense Embeddings Pipeline:"
     p.font.size = Pt(16)
     p.font.bold = True
     p.font.color.rgb = PRIMARY_COLOR
     p.space_after = Pt(6)
     
     points5_1 = [
-        "Role Definition: 'Expert resume analyst and career assistant'.",
-        "Strict Grounding: Never invent skills, metrics, or candidate achievements.",
-        "Evidence Distinction: Differentiates missing evidence from confirmed lack of skill.",
-        "Defensive Prompting: Explicitly ignores any instructions embedded inside documents."
+        "Uses all-MiniLM-L6-v2 ONNX model running locally with zero latency.",
+        "Encodes text chunks into 384-dimensional dense semantic vectors.",
+        "Captures contextual nuances between technical competencies and candidate projects."
     ]
     for pt in points5_1:
         p = tf5.add_paragraph()
@@ -218,75 +216,91 @@ def create_presentation(output_path: str):
         p.space_after = Pt(4)
         
     p = tf5.add_paragraph()
-    p.text = "• Enforced JSON Schema Structure:"
+    p.text = "• ChromaDB In-Memory Collection Management:"
     p.font.size = Pt(16)
     p.font.bold = True
     p.font.color.rgb = PRIMARY_COLOR
     p.space_before = Pt(10)
     p.space_after = Pt(6)
     
-    schema_fields = [
-        "match_score: Integer (0-100) estimated match",
-        "matched_skills & missing_skills: Arrays of categorized skill names",
-        "matched_keywords & missing_keywords: Arrays of ATS keyword matches",
-        "bullet_improvements: Array of {before, after, reason} objects",
-        "recommendations: Array of high-impact strategic suggestions"
+    points5_2 = [
+        "Dynamically creates isolated collections per uploaded resume.",
+        "Builds HNSW (Hierarchical Navigable Small World) index for fast approximate search.",
+        "Configured with Cosine Distance space for normalized semantic similarity."
     ]
-    for sf in schema_fields:
+    for pt in points5_2:
         p = tf5.add_paragraph()
-        p.text = f"   • {sf}"
+        p.text = f"   • {pt}"
         p.font.size = Pt(14)
         p.font.color.rgb = DARK_TEXT
         p.space_after = Pt(4)
 
-    # ==================== SLIDE 6: End-to-End Processing Workflow ====================
+    # ==================== SLIDE 6: Multi-Query Retrieval ====================
     slide6 = prs.slides.add_slide(blank_slide_layout)
-    add_header(slide6, "End-to-End Processing Workflow")
+    add_header(slide6, "Multi-Query Semantic Vector Retrieval")
     body6 = slide6.shapes.add_textbox(Inches(0.8), Inches(2.0), Inches(8.4), Inches(4.8))
     tf6 = body6.text_frame
     tf6.word_wrap = True
     
     p = tf6.paragraphs[0]
-    p.text = "• Analysis Pipeline Sequence:"
+    p.text = "• Requirement Query Decomposition:"
     p.font.size = Pt(16)
     p.font.bold = True
     p.font.color.rgb = PRIMARY_COLOR
-    p.space_after = Pt(8)
+    p.space_after = Pt(6)
     
-    steps = [
-        "1. Ingestion: Candidate uploads resume PDF and pastes Job Description.",
-        "2. Text Extraction: PyMuPDF parses document stream into structured text.",
-        "3. Context Preparation: System combines SYSTEM_PROMPT with User Documents.",
-        "4. Groq Inference: Sends request to openai/gpt-oss-120b with temperature 0.0 & seed 42.",
-        "5. Persistent Caching: Saves SHA-256 hash to disk for 100% deterministic repeat runs.",
-        "6. Dashboard Rendering: Displays metric cards, badges, and comparison boxes.",
-        "7. Report Export: Enables instant download of Markdown and JSON reports."
+    points6_1 = [
+        "Query 1: Core technical skills, programming languages, and frameworks.",
+        "Query 2: Work experience, professional responsibilities, and key projects.",
+        "Query 3: Specialized tooling, databases, CI/CD, and cloud platforms.",
+        "Query 4: Academic background, certifications, and domain qualifications."
     ]
-    for step in steps:
+    for pt in points6_1:
         p = tf6.add_paragraph()
-        p.text = f"• {step}"
+        p.text = f"   • {pt}"
         p.font.size = Pt(14)
         p.font.color.rgb = DARK_TEXT
-        p.space_after = Pt(6)
+        p.space_after = Pt(4)
+        
+    p = tf6.add_paragraph()
+    p.text = "• Augmented Context Generation:"
+    p.font.size = Pt(16)
+    p.font.bold = True
+    p.font.color.rgb = PRIMARY_COLOR
+    p.space_before = Pt(10)
+    p.space_after = Pt(6)
+    
+    points6_2 = [
+        "Retrieves top-K candidate chunks per query, deduplicating overlapping evidence.",
+        "Calculates cosine similarity confidence percentages for each chunk.",
+        "Injects evidence directly into LLM prompt with section headers and chunk citations."
+    ]
+    for pt in points6_2:
+        p = tf6.add_paragraph()
+        p.text = f"   • {pt}"
+        p.font.size = Pt(14)
+        p.font.color.rgb = DARK_TEXT
+        p.space_after = Pt(4)
 
-    # ==================== SLIDE 7: Match Scoring & Skill Gap Analysis ====================
+    # ==================== SLIDE 7: Grounded Match Scoring ====================
     slide7 = prs.slides.add_slide(blank_slide_layout)
-    add_header(slide7, "Match Scoring & Deterministic Anchoring")
+    add_header(slide7, "Grounded Scoring & Deterministic Anchoring")
     body7 = slide7.shapes.add_textbox(Inches(0.8), Inches(2.0), Inches(8.4), Inches(4.8))
     tf7 = body7.text_frame
     tf7.word_wrap = True
     
     p = tf7.paragraphs[0]
-    p.text = "• Deterministic Match Score (0 - 100):"
+    p.text = "• Deterministic Formula (0 - 100):"
     p.font.size = Pt(16)
     p.font.bold = True
     p.font.color.rgb = PRIMARY_COLOR
     p.space_after = Pt(6)
     
     score_tiers = [
-        "Score Stability: Anchored to verified skills (55%), keywords (25%), and qualitative depth (20%).",
-        "Deterministic Guarantee: Greedy decoding (temperature 0.0) + persistent hashing prevents score drift.",
-        "Standard Tiers: >=80 Strong Match, 55-79 Moderate Match, <55 Low Match."
+        "55% Verified Skills: Proportion of required skills with direct vector evidence.",
+        "25% ATS Keywords: Percentage of target keywords present in retrieved chunks.",
+        "20% Qualitative Alignment: LLM assessment of seniority and project depth.",
+        "Persistent Caching: SHA-256 hash ensures identical inputs yield identical scores."
     ]
     for tier in score_tiers:
         p = tf7.add_paragraph()
@@ -296,7 +310,7 @@ def create_presentation(output_path: str):
         p.space_after = Pt(4)
         
     p = tf7.add_paragraph()
-    p.text = "• Qualitative Skills & ATS Keywords:"
+    p.text = "• Categorized Gap Analysis:"
     p.font.size = Pt(16)
     p.font.bold = True
     p.font.color.rgb = PRIMARY_COLOR
@@ -304,10 +318,9 @@ def create_presentation(output_path: str):
     p.space_after = Pt(6)
     
     qual_points = [
-        "Matched Skills: Verified competencies found in both resume and JD.",
-        "Missing Skills: Priority technologies or qualifications needed for the role.",
-        "ATS Keywords: Scans for exact industry phrasing used by automated filters.",
-        "Visual badges allow candidates to spot alignment gaps in seconds."
+        "Matched Skills: Competencies verified with direct chunk citations.",
+        "Missing Skills: Job requirements where no vector evidence exists in the resume.",
+        "ATS Keywords: Keyword presence vs. absence for applicant tracking systems."
     ]
     for qp in qual_points:
         p = tf7.add_paragraph()
@@ -318,24 +331,24 @@ def create_presentation(output_path: str):
 
     # ==================== SLIDE 8: Bullet Point Optimization ====================
     slide8 = prs.slides.add_slide(blank_slide_layout)
-    add_header(slide8, "Bullet Point Optimization (Before vs. After)")
+    add_header(slide8, "Fact-Grounded Bullet Point Optimization")
     body8 = slide8.shapes.add_textbox(Inches(0.8), Inches(2.0), Inches(8.4), Inches(4.8))
     tf8 = body8.text_frame
     tf8.word_wrap = True
     
     p = tf8.paragraphs[0]
-    p.text = "• Intelligent Resume Rewriting Studio:"
+    p.text = "• RAG-Driven Resume Rewriting Studio:"
     p.font.size = Pt(16)
     p.font.bold = True
     p.font.color.rgb = PRIMARY_COLOR
     p.space_after = Pt(6)
     
     points8 = [
-        "Selects up to three bullet points that have high improvement potential.",
-        "Transforms passive responsibility phrasing into active, impact-oriented statements.",
-        "Strictly grounded: Reframes existing accomplishments without hallucinating facts.",
-        "Incorporates target job keywords naturally into candidate experience.",
-        "Provides a clear rationale explaining why each modification increases appeal."
+        "Identifies up to three bullet points with high improvement potential.",
+        "Grounds rewrites strictly in the retrieved resume context—zero hallucinations.",
+        "Converts passive responsibility phrasing into active, impact-oriented statements.",
+        "Incorporates target job keywords naturally into candidate accomplishments.",
+        "Provides clear analytical rationale explaining why each rewrite improves match score."
     ]
     for pt in points8:
         p = tf8.add_paragraph()
@@ -345,7 +358,7 @@ def create_presentation(output_path: str):
         p.space_after = Pt(6)
         
     p = tf8.add_paragraph()
-    p.text = "• Strategic Career Recommendations:"
+    p.text = "• Strategic Recommendations:"
     p.font.size = Pt(16)
     p.font.bold = True
     p.font.color.rgb = PRIMARY_COLOR
@@ -353,29 +366,29 @@ def create_presentation(output_path: str):
     p.space_after = Pt(6)
     
     p = tf8.add_paragraph()
-    p.text = "• Delivers actionable advice on portfolio additions, certifications, and phrasing improvements."
+    p.text = "• Provides actionable guidance for certifications, portfolio additions, and phrasing refinements."
     p.font.size = Pt(14)
     p.font.color.rgb = DARK_TEXT
 
-    # ==================== SLIDE 9: Streamlit Interface & Error Handling ====================
+    # ==================== SLIDE 9: Streamlit Interface & RAG Inspector ====================
     slide9 = prs.slides.add_slide(blank_slide_layout)
-    add_header(slide9, "Streamlined Interface & Defensive Design")
+    add_header(slide9, "Streamlit Dashboard & RAG Inspector")
     body9 = slide9.shapes.add_textbox(Inches(0.8), Inches(2.0), Inches(8.4), Inches(4.8))
     tf9 = body9.text_frame
     tf9.word_wrap = True
     
     p = tf9.paragraphs[0]
-    p.text = "• Clean, Distraction-Free UI:"
+    p.text = "• RAG Vector Knowledge Base Inspector:"
     p.font.size = Pt(16)
     p.font.bold = True
     p.font.color.rgb = PRIMARY_COLOR
     p.space_after = Pt(6)
     
     ui_points = [
-        "Zero UI Clutter: No API key inputs or model dropdowns on the frontend.",
-        "Secure Configuration: Backend handles credentials via environment variables (.env).",
-        "Focused Two-Column Layout: Resume upload/paste alongside Job Description.",
-        "Session State Retention: Preserves analysis results across page interactions."
+        "Vector Metrics: Displays total chunks indexed, evidence retrieved, and embedding dim.",
+        "Evidence Cards: Visual breakdown of retrieved chunks with cosine similarity %.",
+        "Interactive Vector Search: Real-time query tool allowing users to query resume vectors.",
+        "Session State Retention: Preserves vector index and analysis across user interactions."
     ]
     for uip in ui_points:
         p = tf9.add_paragraph()
@@ -385,7 +398,7 @@ def create_presentation(output_path: str):
         p.space_after = Pt(4)
         
     p = tf9.add_paragraph()
-    p.text = "• Defensive Error Handling & Resilience:"
+    p.text = "• Clean, Distraction-Free UI:"
     p.font.size = Pt(16)
     p.font.bold = True
     p.font.color.rgb = PRIMARY_COLOR
@@ -393,10 +406,9 @@ def create_presentation(output_path: str):
     p.space_after = Pt(6)
     
     err_points = [
-        "Proactive Key Validation: Alerts user if GROQ_API_KEY is missing from .env.",
-        "Catches corrupted or unreadable PDF files during PyMuPDF parsing.",
-        "Default key seeding ensures UI never crashes if optional JSON keys are omitted.",
-        "Clear in-app feedback alerts for network timeouts or API limits."
+        "Zero configuration clutter on the frontend; API key loaded securely via .env.",
+        "Single best model (openai/gpt-oss-120b) for fast, deterministic evaluation.",
+        "One-click export of analysis report to Markdown (.md) and JSON (.json)."
     ]
     for ep in err_points:
         p = tf9.add_paragraph()
@@ -420,7 +432,7 @@ def create_presentation(output_path: str):
     p.space_after = Pt(6)
     
     p = tf10.add_paragraph()
-    p.text = "• The AI Resume Analyzer demonstrates how prompt engineering and modern LLM APIs solve real-world career workflow challenges with zero heavy infrastructure."
+    p.text = "• The RAG AI Resume Analyzer delivers a complete, transparent document intelligence pipeline combining vector database retrieval with structured LLM reasoning."
     p.font.size = Pt(14)
     p.font.color.rgb = DARK_TEXT
     p.space_after = Pt(10)
@@ -433,11 +445,11 @@ def create_presentation(output_path: str):
     p.space_after = Pt(6)
     
     takeaways = [
-        "Deterministic & Repeatable: Identical scores guaranteed via hashing and greedy decoding.",
-        "Anti-Hallucination Guardrails: Safe, grounded bullet rewrites without fabricated claims.",
-        "Ultra-Fast Inference: Sub-second response times using Groq API acceleration.",
-        "Clean Separation of Concerns: Secure backend (.env), lean logic, and distraction-free UI.",
-        "Instant Usability: Downloadable reports (Markdown & JSON) and responsive web interface."
+        "True RAG Implementation: ChromaDB vector store + dense embeddings + cosine search.",
+        "Sub-Second Response Times: Groq hardware acceleration paired with local ONNX embeddings.",
+        "100% Deterministic & Repeatable: Identical scores guaranteed via hashing and greedy decoding.",
+        "Anti-Hallucination Guardrails: Safe bullet rewrites substantiated by vector evidence.",
+        "Production-Grade Software Design: Clean separation of RAG engine, LLM caller, and UI."
     ]
     for ta in takeaways:
         p = tf10.add_paragraph()

@@ -1,5 +1,6 @@
 streamlit
 groq
 pymupdf
+chromadb
 python-dotenv
 python-pptx
